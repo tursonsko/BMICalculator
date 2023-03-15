@@ -10,6 +10,10 @@ import android.widget.TextView; // for displaying text
 
 import java.text.NumberFormat; // for currency formatting
 
+/**
+ * BMI Calculator
+ * Author Wojciech Turek s21611
+ */
 public class MainActivity extends AppCompatActivity {
 
     // currency and percent formatter objects
