@@ -17,6 +17,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Author Wojciech Turek s21611
+ */
 public class QuizActivity extends AppCompatActivity {
 
     private TextView questionTextView;
