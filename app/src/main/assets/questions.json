@@ -1,0 +1,34 @@
+{
+  "questions": [
+    {
+      "question": "Which nutrient is important for strong bones?",
+      "options": ["Protein", "Calcium", "Iron", "Vitamin C"],
+      "answer": "Calcium"
+    },
+    {
+      "question": "Which food is a good source of protein?",
+      "options": ["Broccoli", "Peanut butter", "White bread", "Candy"],
+      "answer": "Peanut butter"
+    },
+    {
+      "question": "Which type of fat is considered healthy?",
+      "options": ["Trans fat", "Saturated fat", "Monounsaturated fat", "Polyunsaturated fat"],
+      "answer": "Monounsaturated fat"
+    },
+    {
+      "question": "What are the effects of regular consumption of processed foods?",
+      "options": ["Obesity", "Diabetes", "Heart disease", "All of the above"],
+      "answer": "All of the above"
+    },
+    {
+      "question": "Which foods are a good source of fiber?",
+      "options": ["Meat", "Fish", "Fruits and vegetables", "Sweets"],
+      "answer": "Fruits and vegetables"
+    },
+    {
+      "question": "What are saturated fats?",
+      "options": ["Plant-based fats", "Animal-based fats", "Trans fats", "Oils"],
+      "answer": "Animal-based fats"
+    }
+  ]
+}

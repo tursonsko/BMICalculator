@@ -15,6 +15,7 @@ public class StartPageActivity extends AppCompatActivity {
     private Button button1;
     private Button button2;
     private Button button3;
+    private Button button4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,15 @@ public class StartPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(StartPageActivity.this, RecipesActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        button4 = findViewById(R.id.button4);
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StartPageActivity.this, QuizActivity.class);
                 startActivity(intent);
             }
         });
