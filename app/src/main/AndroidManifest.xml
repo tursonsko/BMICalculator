@@ -23,6 +23,9 @@
         <activity android:name=".SpaghettiWithMeatballsActivity"></activity>
         <activity android:name=".ChickenAlfredoActivity"></activity>
         <activity android:name=".QuizActivity"></activity>
+        <activity
+            android:name=".BMIGraphActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

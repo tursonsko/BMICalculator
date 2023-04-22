@@ -2,13 +2,19 @@ package com.example.tipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable; // for EditText event handling
 import android.text.TextWatcher; // EditText listener
+import android.widget.Button;
 import android.widget.EditText; // for bill amount input
 import android.widget.TextView; // for displaying text
 
+import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.text.NumberFormat; // for currency formatting
+import java.util.Date;
 
 /**
  * BMI Calculator
@@ -17,24 +23,34 @@ import java.text.NumberFormat; // for currency formatting
 public class BmiCalculatorActivity extends AppCompatActivity {
 
     // currency and percent formatter objects
-    private static final NumberFormat currencyFormat =
-            NumberFormat.getNumberInstance();
+//    private static final NumberFormat currencyFormat =
+//            NumberFormat.getNumberInstance();
+    private static final DecimalFormat currencyFormat = new DecimalFormat("#.##");
+
 
     private double heightAmount = 0.0; // bill amount entered by the user
     private double weightAmount = 0.0; // bill amount entered by the user
     private TextView amountTextView; // shows formatted bill amount
     private TextView amountTextView2; // shows formatted bill amount
     private TextView totalTextView; // shows calculated tip amount
+    private BMIResultData bmiResultData;
+    private Button saveButton; // save button
+    private Button chartView; // save button
 
     // called when the activity is first created
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState); // call superclass onCreate
         setContentView(R.layout.activity_bmi); // inflate the GUI
-
+        bmiResultData = BMIResultData.getInstance();
         // get references to programmatically manipulated TextViews
         amountTextView = (TextView) findViewById(R.id.amountTextView);
+        amountTextView.setFocusable(true);
+        amountTextView.setFocusableInTouchMode(true);
         amountTextView2 = (TextView) findViewById(R.id.amountTextView2);
+        amountTextView2.setFocusable(true);
+        amountTextView2.setFocusableInTouchMode(true);
         totalTextView = (TextView) findViewById(R.id.totalTextView);
         totalTextView.setText(currencyFormat.format(0));
 
@@ -47,6 +63,22 @@ public class BmiCalculatorActivity extends AppCompatActivity {
                 (EditText) findViewById(R.id.amountEditText2);
         amountEditText2.addTextChangedListener(amountEditTextWatcher2);
 
+        saveButton = findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(v -> saveBMIResult());
+
+        chartView = findViewById(R.id.graph);
+        chartView.setOnClickListener(v -> startBMIGraphActivity());
+    }
+
+    private void saveBMIResult() {
+        double bmi = Double.parseDouble(totalTextView.getText().toString());
+
+        bmiResultData.addBMIResult(bmi);
+    }
+
+    private void startBMIGraphActivity() {
+        Intent intent = new Intent(this, BMIGraphActivity.class);
+        startActivity(intent);
     }
 
     // calculate and display tip and total amounts
@@ -116,6 +148,16 @@ public class BmiCalculatorActivity extends AppCompatActivity {
         public void beforeTextChanged(
                 CharSequence s, int start, int count, int after) { }
     };
+
+    public static class BMIResult implements Serializable {
+        public double bmi;
+        public Date date;
+
+        public BMIResult(double bmi, Date date) {
+            this.bmi = bmi;
+            this.date = date;
+        }
+    }
 }
 
 
