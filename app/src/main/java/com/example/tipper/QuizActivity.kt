@@ -1,154 +1,121 @@
-package com.example.tipper;
+package com.example.tipper
 
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import com.google.gson.Gson;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Bundle
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import java.io.IOException
 
 /**
  * Author Wojciech Turek s21611
  */
-public class QuizActivity extends AppCompatActivity {
-
-    private TextView questionTextView;
-    private RadioGroup optionsRadioGroup;
-    private Button nextButton;
-    private int currentQuestionIndex = 0;
-    private int score = 0;
-    private List<Question> questionList;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_quiz);
+class QuizActivity : AppCompatActivity() {
+    private var questionTextView: TextView? = null
+    private var optionsRadioGroup: RadioGroup? = null
+    private var nextButton: Button? = null
+    private var currentQuestionIndex = 0
+    private var score = 0
+    private var questionList: List<Question>? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_quiz)
 
         // Initialize views
-        questionTextView = findViewById(R.id.question_text_view);
-        optionsRadioGroup = findViewById(R.id.options_radio_group);
-        nextButton = findViewById(R.id.next_button);
+        questionTextView = findViewById(R.id.question_text_view)
+        optionsRadioGroup = findViewById(R.id.options_radio_group)
+        nextButton = findViewById(R.id.next_button)
 
         // Load questions from JSON file
-        String json = loadJSONFromAsset("questions.json");
-        Gson gson = new Gson();
-        QuestionList questionListObject = gson.fromJson(json, QuestionList.class);
-        questionList = questionListObject.getQuestions();
+        val json = loadJSONFromAsset("questions.json")
+        val gson = Gson()
+        val questionListObject = gson.fromJson(json, QuestionList::class.java)
+        questionList = questionListObject.questions
 
         // Display first question
-        displayQuestion(currentQuestionIndex);
+        displayQuestion(currentQuestionIndex)
 
         // Set up button click listener
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Check if an answer was selected
-                int selectedOptionId = optionsRadioGroup.getCheckedRadioButtonId();
-                if (selectedOptionId == -1) {
-                    return;
-                }
-                // Check if answer is correct
-                RadioButton selectedOption = findViewById(selectedOptionId);
-                String selectedAnswer = selectedOption.getText().toString();
-                String correctAnswer = questionList.get(currentQuestionIndex).getAnswer();
-
-                if (selectedAnswer.equals(correctAnswer)) {
-                    score++;
-                }
-                // Go to next question
-                currentQuestionIndex++;
-                if (currentQuestionIndex < questionList.size()) {
-                    displayQuestion(currentQuestionIndex);
-                } else {
-                    endQuiz(score);
-                }
+        nextButton?.setOnClickListener(View.OnClickListener { // Check if an answer was selected
+            val selectedOptionId = optionsRadioGroup?.getCheckedRadioButtonId()
+            if (selectedOptionId == -1) {
+                return@OnClickListener
             }
-        });
+            // Check if answer is correct
+            val selectedOption = findViewById<RadioButton>(selectedOptionId!!)
+            val selectedAnswer = selectedOption.text.toString()
+            val correctAnswer = questionList!![currentQuestionIndex].answer
+            if (selectedAnswer == correctAnswer) {
+                score++
+            }
+            // Go to next question
+            currentQuestionIndex++
+            if (currentQuestionIndex < questionList!!.size) {
+                displayQuestion(currentQuestionIndex)
+            } else {
+                endQuiz(score)
+            }
+        })
     }
 
-    private void displayQuestion(int questionIndex) {
+    private fun displayQuestion(questionIndex: Int) {
         // Set question text
-        String questionText = questionList.get(questionIndex).getQuestion();
-        questionTextView.setText(questionText);
+        val questionText = questionList!![questionIndex].question
+        questionTextView!!.text = questionText
         // Set options
-        List<String> options = questionList.get(questionIndex).getOptions();
-        optionsRadioGroup.removeAllViews();
-        for (int i = 0; i < options.size(); i++) {
-            RadioButton radioButton = new RadioButton(this);
-            radioButton.setText(options.get(i));
-            optionsRadioGroup.addView(radioButton);
+        val options = questionList!![questionIndex].options
+        optionsRadioGroup!!.removeAllViews()
+        for (i in options!!.indices) {
+            val radioButton = RadioButton(this)
+            radioButton.text = options[i]
+            optionsRadioGroup!!.addView(radioButton)
         }
         // Clear selection
-        optionsRadioGroup.clearCheck();
+        optionsRadioGroup!!.clearCheck()
     }
 
-    private String loadJSONFromAsset(String fileName) {
-        String json = null;
-        try {
-            InputStream inputStream = getAssets().open(fileName);
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+    private fun loadJSONFromAsset(fileName: String): String? {
+        var json: String? = null
+        json = try {
+            val inputStream = assets.open(fileName)
+            val size = inputStream.available()
+            val buffer = ByteArray(size)
+            inputStream.read(buffer)
+            inputStream.close()
+            String(buffer, Charsets.UTF_8)
+        } catch (ex: IOException) {
+            ex.printStackTrace()
+            return null
         }
-        return json;
+        return json
     }
 
-    private void endQuiz(int score) {
+    private fun endQuiz(score: Int) {
 
         // Display the score
-        String message = "Quiz ended. Your score: " + score + " out of " + questionList.size();
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        val message = "Quiz ended. Your score: " + score + " out of " + questionList!!.size
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
         // Allow the user to start over or exit the app
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Quiz ended");
-        builder.setMessage(message);
-        builder.setPositiveButton("Start over", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Reset the quiz
-                currentQuestionIndex = 0;
-                for (Question question : questionList) {
-                    question.setAnswered(false);
-                }
-                displayQuestion(currentQuestionIndex);
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Quiz ended")
+        builder.setMessage(message)
+        builder.setPositiveButton("Start over") { dialog, which -> // Reset the quiz
+            currentQuestionIndex = 0
+            for (question in questionList!!) {
+                question.isAnswered = false
             }
-        });
-        builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Exit the app
-                finish();
-            }
-        });
-        builder.setCancelable(false);
-        builder.show();
+            displayQuestion(currentQuestionIndex)
+        }
+        builder.setNegativeButton("Exit") { dialog, which -> // Exit the app
+            finish()
+        }
+        builder.setCancelable(false)
+        builder.show()
     }
 
-    private class QuestionList {
-        private List<Question> questions;
-
-        public List<Question> getQuestions() {
-            return questions;
-        }
-
-        public void setQuestions(List<Question> questions) {
-            this.questions = questions;
-        }
+    private inner class QuestionList {
+        var questions: List<Question>? = null
     }
 }

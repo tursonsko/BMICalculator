@@ -1,110 +1,97 @@
-package com.example.tipper;
+package com.example.tipper
 
-import android.graphics.Color;
-import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.LegendEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.graphics.Color
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.tipper.BmiCalculatorActivity.BMIResult
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.LegendEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 
 /**
  * Author Wojciech Turek s21611
  */
-public class BMIGraphActivity extends AppCompatActivity {
-    private BMIResultData bmiResultData;
-    private LineChart bmiLineChart;
-    private RecyclerView bmiRecyclerView;
-    private List<BmiCalculatorActivity.BMIResult> bmiResults = new ArrayList<>(); // Pass this from the BMIActivity
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bmigraph);
-        bmiResultData = BMIResultData.getInstance();
-
-        bmiResults = bmiResultData.getBMIResults();
+class BMIGraphActivity : AppCompatActivity() {
+    private var bmiResultData: BMIResultData? = null
+    private var bmiLineChart: LineChart? = null
+    private var bmiRecyclerView: RecyclerView? = null
+    private var bmiResults: List<BMIResult>? = ArrayList() // Pass this from the BMIActivity
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_bmigraph)
+        bmiResultData = BMIResultData.instance
+        bmiResults = bmiResultData?.bMIResults
 
 
         // Initialize the LineChart
-        bmiLineChart = findViewById(R.id.bmiLineChart);
-        setupLineChart();
+        bmiLineChart = findViewById(R.id.bmiLineChart)
+        setupLineChart()
 
         // Initialize the RecyclerView
-        bmiRecyclerView = findViewById(R.id.bmiRecyclerView);
-        setupRecyclerView();
+        bmiRecyclerView = findViewById(R.id.bmiRecyclerView)
+        setupRecyclerView()
     }
-    private void setupLineChart() {
+
+    private fun setupLineChart() {
         if (bmiResults != null) {
-            List<Entry> entries = new ArrayList<>();
-
-            for (int i = 0; i < bmiResults.size(); i++) {
-                BmiCalculatorActivity.BMIResult result = bmiResults.get(i);
-                entries.add(new Entry(i, (float) result.bmi));
+            val entries: MutableList<Entry> = ArrayList()
+            for (i in bmiResults!!.indices) {
+                val result = bmiResults!![i]
+                entries.add(Entry(i.toFloat(), result.bmi.toFloat()))
             }
-
-            LineDataSet dataSet = new LineDataSet(entries, "BMI");
-            dataSet.setColor(Color.BLUE); // Set a default color
-            dataSet.setDrawValues(false); // Hide the values in the chart
+            val dataSet = LineDataSet(entries, "BMI")
+            dataSet.color = Color.BLUE // Set a default color
+            dataSet.setDrawValues(false) // Hide the values in the chart
 
             // Set colors based on BMI ranges
-            float bmi;
-            for (int i = 0; i < entries.size(); i++) {
-                bmi = entries.get(i).getY();
+            var bmi: Float
+            for (i in entries.indices) {
+                bmi = entries[i].y
                 if (bmi < 16.0) {
-                    dataSet.setColor(getResources().getColor(R.color.colorEmaciation));
+                    dataSet.color = resources.getColor(R.color.colorEmaciation)
                 } else if (bmi < 17.0) {
-                    dataSet.setColor(getResources().getColor(R.color.colorUnderweight));
+                    dataSet.color = resources.getColor(R.color.colorUnderweight)
                 } else if (bmi < 18.5) {
-                    dataSet.setColor(getResources().getColor(R.color.colorLowWeight));
+                    dataSet.color = resources.getColor(R.color.colorLowWeight)
                 } else if (bmi < 25.0) {
-                    dataSet.setColor(getResources().getColor(R.color.colorNormalWeight));
+                    dataSet.color = resources.getColor(R.color.colorNormalWeight)
                 } else if (bmi < 30.0) {
-                    dataSet.setColor(getResources().getColor(R.color.colorOverweight));
+                    dataSet.color = resources.getColor(R.color.colorOverweight)
                 } else if (bmi < 35.0) {
-                    dataSet.setColor(getResources().getColor(R.color.colorFirstDegreeObesity));
+                    dataSet.color = resources.getColor(R.color.colorFirstDegreeObesity)
                 } else if (bmi < 40.0) {
-                    dataSet.setColor(getResources().getColor(R.color.colorSecondDegreeObesity));
+                    dataSet.color = resources.getColor(R.color.colorSecondDegreeObesity)
                 } else {
-                    dataSet.setColor(getResources().getColor(R.color.colorExtremeObesity));
+                    dataSet.color = resources.getColor(R.color.colorExtremeObesity)
                 }
             }
-
-            LineData lineData = new LineData(dataSet);
-            bmiLineChart.setData(lineData);
+            val lineData = LineData(dataSet)
+            bmiLineChart!!.data = lineData
 
             // Add custom legend entries
-            ArrayList<LegendEntry> legendEntries = new ArrayList<>();
-            String[] labels = new String[]{"Emaciation", "Underweight", "Low weight", "Normal weight", "Overweight", "First-degree obesity", "Second-degree obesity", "Extreme obesity"};
-            int[] colors = new int[]{getResources().getColor(R.color.colorEmaciation), getResources().getColor(R.color.colorUnderweight), getResources().getColor(R.color.colorLowWeight), getResources().getColor(R.color.colorNormalWeight), getResources().getColor(R.color.colorOverweight), getResources().getColor(R.color.colorFirstDegreeObesity), getResources().getColor(R.color.colorSecondDegreeObesity), getResources().getColor(R.color.colorExtremeObesity)};
-            for (int i = 0; i < labels.length; i++) {
-                LegendEntry entry = new LegendEntry();
-                entry.label = labels[i];
-                entry.formColor = colors[i];
-                legendEntries.add(entry);
+            val legendEntries = ArrayList<LegendEntry>()
+            val labels = arrayOf("Emaciation", "Underweight", "Low weight", "Normal weight", "Overweight", "First-degree obesity", "Second-degree obesity", "Extreme obesity")
+            val colors = intArrayOf(resources.getColor(R.color.colorEmaciation), resources.getColor(R.color.colorUnderweight), resources.getColor(R.color.colorLowWeight), resources.getColor(R.color.colorNormalWeight), resources.getColor(R.color.colorOverweight), resources.getColor(R.color.colorFirstDegreeObesity), resources.getColor(R.color.colorSecondDegreeObesity), resources.getColor(R.color.colorExtremeObesity))
+            for (i in labels.indices) {
+                val entry = LegendEntry()
+                entry.label = labels[i]
+                entry.formColor = colors[i]
+                legendEntries.add(entry)
             }
-            Legend legend = bmiLineChart.getLegend();
-            legend.setCustom(legendEntries);
-
-            bmiLineChart.invalidate(); // Refresh the chart
+            val legend = bmiLineChart!!.legend
+            legend.setCustom(legendEntries)
+            bmiLineChart!!.invalidate() // Refresh the chart
         }
     }
 
-
-    private void setupRecyclerView() {
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        bmiRecyclerView.setLayoutManager(layoutManager);
-
-        BMIResultAdapter adapter = new BMIResultAdapter(bmiResults);
-        bmiRecyclerView.setAdapter(adapter);
+    private fun setupRecyclerView() {
+        val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
+        bmiRecyclerView!!.layoutManager = layoutManager
+        val adapter = BMIResultAdapter(bmiResults!!)
+        bmiRecyclerView!!.adapter = adapter
     }
 }

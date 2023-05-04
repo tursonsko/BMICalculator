@@ -1,31 +1,29 @@
-package com.example.tipper;
+package com.example.tipper
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.example.tipper.BmiCalculatorActivity.BMIResult
+import java.util.*
 
 /**
  * Author Wojciech Turek s21611
  */
-public class BMIResultData {
-    private static BMIResultData instance;
-    private List<BmiCalculatorActivity.BMIResult> bmiResults = new ArrayList<>();
+class BMIResultData private constructor() {
+    private val bmiResults: MutableList<BMIResult> = ArrayList()
+    val bMIResults: List<BMIResult>
+        get() = bmiResults
 
-    private BMIResultData() {}
-
-    public static BMIResultData getInstance() {
-        if (instance == null) {
-            instance = new BMIResultData();
-        }
-        return instance;
+    fun addBMIResult(bmi: Double) {
+        val result = BMIResult(bmi, Date())
+        bmiResults.add(result)
     }
 
-    public List<BmiCalculatorActivity.BMIResult> getBMIResults() {
-        return bmiResults;
-    }
-
-    public void addBMIResult(double bmi) {
-        BmiCalculatorActivity.BMIResult result = new BmiCalculatorActivity.BMIResult(bmi, new Date());
-        bmiResults.add(result);
+    companion object {
+        var instance: BMIResultData? = null
+            get() {
+                if (field == null) {
+                    field = BMIResultData()
+                }
+                return field
+            }
+            private set
     }
 }

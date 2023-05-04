@@ -1,177 +1,136 @@
-package com.example.tipper;
+package com.example.tipper
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import java.io.Serializable
+import java.text.DecimalFormat
+import java.util.*
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.Editable; // for EditText event handling
-import android.text.TextWatcher; // EditText listener
-import android.widget.Button;
-import android.widget.EditText; // for bill amount input
-import android.widget.TextView; // for displaying text
-
-import java.io.Serializable;
-import java.text.DecimalFormat;
-import java.text.NumberFormat; // for currency formatting
-import java.util.Date;
-
+// for EditText event handling
+// EditText listener
+// for bill amount input
+// for displaying text
+// for currency formatting
 /**
  * BMI Calculator
  * Author Wojciech Turek s21611
  */
-public class BmiCalculatorActivity extends AppCompatActivity {
-
-    // currency and percent formatter objects
-//    private static final NumberFormat currencyFormat =
-//            NumberFormat.getNumberInstance();
-    private static final DecimalFormat currencyFormat = new DecimalFormat("#.##");
-
-
-    private double heightAmount = 0.0; // bill amount entered by the user
-    private double weightAmount = 0.0; // bill amount entered by the user
-    private TextView amountTextView; // shows formatted bill amount
-    private TextView amountTextView2; // shows formatted bill amount
-    private TextView totalTextView; // shows calculated tip amount
-    private BMIResultData bmiResultData;
-    private Button saveButton; // save button
-    private Button chartView; // save button
+class BmiCalculatorActivity : AppCompatActivity() {
+    private var heightAmount = 0.0 // bill amount entered by the user
+    private var weightAmount = 0.0 // bill amount entered by the user
+    private var amountTextView // shows formatted bill amount
+            : TextView? = null
+    private var amountTextView2 // shows formatted bill amount
+            : TextView? = null
+    private var totalTextView // shows calculated tip amount
+            : TextView? = null
+    private var bmiResultData: BMIResultData? = null
+    private var saveButton // save button
+            : Button? = null
+    private var chartView // save button
+            : Button? = null
 
     // called when the activity is first created
     @SuppressLint("MissingInflatedId")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); // call superclass onCreate
-        setContentView(R.layout.activity_bmi); // inflate the GUI
-        bmiResultData = BMIResultData.getInstance();
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState) // call superclass onCreate
+        setContentView(R.layout.activity_bmi) // inflate the GUI
+        bmiResultData = BMIResultData.instance
         // get references to programmatically manipulated TextViews
-        amountTextView = (TextView) findViewById(R.id.amountTextView);
-        amountTextView.setFocusable(true);
-        amountTextView.setFocusableInTouchMode(true);
-        amountTextView2 = (TextView) findViewById(R.id.amountTextView2);
-        amountTextView2.setFocusable(true);
-        amountTextView2.setFocusableInTouchMode(true);
-        totalTextView = (TextView) findViewById(R.id.totalTextView);
-        totalTextView.setText(currencyFormat.format(0));
+        amountTextView = findViewById<View>(R.id.amountTextView) as TextView
+        amountTextView!!.isFocusable = true
+        amountTextView!!.isFocusableInTouchMode = true
+        amountTextView2 = findViewById<View>(R.id.amountTextView2) as TextView
+        amountTextView2!!.isFocusable = true
+        amountTextView2!!.isFocusableInTouchMode = true
+        totalTextView = findViewById<View>(R.id.totalTextView) as TextView
+        totalTextView!!.text = currencyFormat.format(0)
 
         // set amountEditText's TextWatcher
-        EditText amountEditText =
-                (EditText) findViewById(R.id.amountEditText);
-        amountEditText.addTextChangedListener(amountEditTextWatcher);
-
-        EditText amountEditText2 =
-                (EditText) findViewById(R.id.amountEditText2);
-        amountEditText2.addTextChangedListener(amountEditTextWatcher2);
-
-        saveButton = findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(v -> saveBMIResult());
-
-        chartView = findViewById(R.id.graph);
-        chartView.setOnClickListener(v -> startBMIGraphActivity());
+        val amountEditText = findViewById<View>(R.id.amountEditText) as EditText
+        amountEditText.addTextChangedListener(amountEditTextWatcher)
+        val amountEditText2 = findViewById<View>(R.id.amountEditText2) as EditText
+        amountEditText2.addTextChangedListener(amountEditTextWatcher2)
+        saveButton = findViewById(R.id.saveButton)
+        saveButton?.setOnClickListener(View.OnClickListener { v: View? -> saveBMIResult() })
+        chartView = findViewById(R.id.graph)
+        chartView?.setOnClickListener(View.OnClickListener { v: View? -> startBMIGraphActivity() })
     }
 
-    private void saveBMIResult() {
-        double bmi = Double.parseDouble(totalTextView.getText().toString());
-
-        bmiResultData.addBMIResult(bmi);
+    private fun saveBMIResult() {
+        val bmi = totalTextView!!.text.toString().toDouble()
+        bmiResultData!!.addBMIResult(bmi)
     }
 
-    private void startBMIGraphActivity() {
-        Intent intent = new Intent(this, BMIGraphActivity.class);
-        startActivity(intent);
+    private fun startBMIGraphActivity() {
+        val intent = Intent(this, BMIGraphActivity::class.java)
+        startActivity(intent)
     }
 
     // calculate and display tip and total amounts
-    private void calculate() {
+    private fun calculate() {
 
         // calculate the tip and total
 //        double tip = billAmount * 1;
-        double total = weightAmount / (heightAmount / 100.00 * heightAmount / 100.00);
+        val total = weightAmount / (heightAmount / 100.00 * heightAmount / 100.00)
 
         // display tip and total formatted as currency
-        totalTextView.setText(currencyFormat.format(total));
+        totalTextView!!.text = currencyFormat.format(total)
     }
-
-
 
     // listener object for the EditText's text-changed events
-    private final TextWatcher amountEditTextWatcher = new TextWatcher() {
+    private val amountEditTextWatcher: TextWatcher = object : TextWatcher {
         // called when the user modifies the bill amount
-        @Override
-        public void onTextChanged(CharSequence s, int start,
-                                  int before, int count) {
-
+        override fun onTextChanged(s: CharSequence, start: Int,
+                                   before: Int, count: Int) {
             try { // get bill amount and display currency formatted value
-                heightAmount = Double.parseDouble(s.toString());
-                amountTextView.setText(currencyFormat.format(heightAmount));
-
+                heightAmount = s.toString().toDouble()
+                amountTextView!!.text = currencyFormat.format(heightAmount)
+            } catch (e: NumberFormatException) { // if s is empty or non-numeric
+                amountTextView!!.text = ""
+                heightAmount = 0.0
             }
-            catch (NumberFormatException e) { // if s is empty or non-numeric
-                amountTextView.setText("");
-                heightAmount = 0.0;
-            }
-
-            calculate(); // update the tip and total TextViews
+            calculate() // update the tip and total TextViews
         }
 
-        @Override
-        public void afterTextChanged(Editable s) { }
-
-        @Override
-        public void beforeTextChanged(
-                CharSequence s, int start, int count, int after) { }
-    };
-
-    private final TextWatcher amountEditTextWatcher2 = new TextWatcher() {
-        // called when the user modifies the bill amount
-        @Override
-        public void onTextChanged(CharSequence s, int start,
-                                  int before, int count) {
-
-            try { // get bill amount and display currency formatted value
-                weightAmount = Double.parseDouble(s.toString());
-                amountTextView2.setText(currencyFormat.format(weightAmount));
-            }
-            catch (NumberFormatException e) { // if s is empty or non-numeric
-                amountTextView2.setText("");
-                weightAmount = 0.0;
-            }
-
-            calculate(); // update the tip and total TextViews
-        }
-
-
-        @Override
-        public void afterTextChanged(Editable s) { }
-
-        @Override
-        public void beforeTextChanged(
-                CharSequence s, int start, int count, int after) { }
-    };
-
-    public static class BMIResult implements Serializable {
-        public double bmi;
-        public Date date;
-
-        public BMIResult(double bmi, Date date) {
-            this.bmi = bmi;
-            this.date = date;
+        override fun afterTextChanged(s: Editable) {}
+        override fun beforeTextChanged(
+                s: CharSequence, start: Int, count: Int, after: Int) {
         }
     }
+    private val amountEditTextWatcher2: TextWatcher = object : TextWatcher {
+        // called when the user modifies the bill amount
+        override fun onTextChanged(s: CharSequence, start: Int,
+                                   before: Int, count: Int) {
+            try { // get bill amount and display currency formatted value
+                weightAmount = s.toString().toDouble()
+                amountTextView2!!.text = currencyFormat.format(weightAmount)
+            } catch (e: NumberFormatException) { // if s is empty or non-numeric
+                amountTextView2!!.text = ""
+                weightAmount = 0.0
+            }
+            calculate() // update the tip and total TextViews
+        }
+
+        override fun afterTextChanged(s: Editable) {}
+        override fun beforeTextChanged(
+                s: CharSequence, start: Int, count: Int, after: Int) {
+        }
+    }
+
+    class BMIResult(var bmi: Double, var date: Date) : Serializable
+    companion object {
+        // currency and percent formatter objects
+        //    private static final NumberFormat currencyFormat =
+        //            NumberFormat.getNumberInstance();
+        private val currencyFormat = DecimalFormat("#.##")
+    }
 }
-
-
-/*************************************************************************
- * (C) Copyright 1992-2016 by Deitel & Associates, Inc. and               *
- * Pearson Education, Inc. All Rights Reserved.                           *
- *                                                                        *
- * DISCLAIMER: The authors and publisher of this book have used their     *
- * best efforts in preparing the book. These efforts include the          *
- * development, research, and testing of the theories and programs        *
- * to determine their effectiveness. The authors and publisher make       *
- * no warranty of any kind, expressed or implied, with regard to these    *
- * programs or to the documentation contained in these books. The authors *
- * and publisher shall not be liable in any event for incidental or       *
- * consequential damages in connection with, or arising out of, the       *
- * furnishing, performance, or use of these programs.                     *
- *************************************************************************/
